@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Una Historia Maravillosa - Juego Educativo</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <main id="pantalla-inicio">
+        <div id="contenedor-inicio">
+            <img src="imgs/intro/Titulo_Escolar_Renovado-Primaria-Libro_01.png" class="logo-titulo" alt="Una Historia Maravillosa">
+            
+            <img src="imgs/intro/Apóstoles-con-Jesús-en-camino.png" class="img-comunidad" alt="Apóstoles con Jesús en camino">
+
+            <img src="imgs/intro/logo_cruz.png" class="img-decorativa-derecha" alt="Personaje">
+
+            <div class="contenedor-botones">
+                <button id="btn-jugar" class="btn-menu btn-primary">¡Iniciar!</button>
+                <button id="btn-instrucciones" class="btn-menu btn-secondary">¿Cómo jugar?</button>
+            </div>
+    
+            <footer class="footer-derechos">
+                <p>© Todos los derechos reservados Casa del Catequista</p>
+                
+            </footer>
+        </div>
+    </main>
+
+    <section id="pantalla-selector" class="hidden">
+        <div id="contenedor-libro">
+            <h2 class="titulo-selector">Elige un capítulo de la historia</h2>
+            
+            <div class="libro-abierto">
+                <div class="pagina-bloque" id="selector-b1">
+                    <div class="contenido-pagina">
+                        <span class="numero-cap">I</span>
+                        <h3>La Creación</h3>
+                        <img src="imgs/intro/icono_bloque1.png" alt="Bloque 1">
+                        <button class="btn-menu btn-primary">Entrar</button>
+                    </div>
+                </div>
+    
+                <div class="pagina-bloque" id="selector-b2">
+                    <div class="contenido-pagina">
+                        <span class="numero-cap">II</span>
+                        <h3>La Infancia</h3>
+                        <img src="imgs/intro/icono_bloque2.png" alt="Bloque 2">
+                        <button class="btn-menu btn-secondary">Entrar</button>
+                    </div>
+                </div>
+    
+                <div class="pagina-bloque" id="selector-b3">
+                    <div class="contenido-pagina">
+                        <span class="numero-cap">III</span>
+                        <h3>Vida y Obra</h3>
+                        <img src="imgs/intro/icono_bloque3.png" alt="Bloque 3">
+                        <button class="btn-menu btn-primary">Entrar</button>
+                    </div>
+                </div>
+            </div>
+            
+            <button id="btn-volver-inicio" class="btn-mini">⬅ Volver al inicio</button>
+        </div>
+    </section>
+
+    <section id="escenario-juego" class="hidden">
+        <div id="contenedor-mision">
+            <div id="marcador-nivel">Día: <span id="contador">0</span>/7</div>
+            
+            <div class="game-area">
+                <div class="drop-container" id="drop-zone"></div>
+                <div class="cards-container" id="cards-container"></div>
+            </div>
+
+            <div class="game-footer">
+                <button class="btn-menu btn-verify" id="btn-verificar">Revisar</button>
+            </div>
+        </div>
+    </section>
+
+    <div id="modal-mensaje" class="modal hidden">
+        <div class="modal-contenido">
+            <h2 id="modal-titulo"></h2>
+            <div id="modal-cuerpo">
+                <p id="modal-texto"></p>
+                <div id="contenedor-opciones"></div> 
+            </div>
+            <button id="btn-cerrar-modal">Continuar</button>
+        </div>
+    </div>
+
+    <script type="module" src="src/main.js"></script>
+</body>
+</html>

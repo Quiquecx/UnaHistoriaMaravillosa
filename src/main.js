@@ -1,5 +1,5 @@
 import { iniciarBloque1 } from './bloque01.js';
-//import { iniciarBloque2 } from './bloque02.js';
+import { iniciarBloque2 } from './bloque02.js';
 //import { iniciarBloque3 } from './bloque03.js';
 
 let puntajeTotal = 0;
@@ -65,12 +65,16 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
+    // En main.js
     function finalizarBloqueGeneral() {
-        mostrarMensajeGlobal("¡Increíble! ✅", "Has completado el capítulo.", true);
+        // Este mensaje solo se dispara cuando el bloque llama a onFinalizar()
+        mostrarMensajeGlobal("¡Increíble! ✅", "Has ordenado correctamente los días de la Creación. ¡Eres un experto!");
+        
         btnCerrarModal.onclick = () => {
             ocultarModal();
             escenarioJuego.classList.add('hidden');
             pantallaSelector.classList.remove('hidden');
+            // Aquí podrías desbloquear el siguiente nivel visualmente en el libro
         };
     }
 
@@ -82,12 +86,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function crearMarcadorPuntos() {
-        if (!document.getElementById('marcador-puntos')) {
-            const marcador = document.createElement('div');
+        let marcador = document.getElementById('marcador-puntos');
+        if (!marcador) {
+            marcador = document.createElement('div');
             marcador.id = 'marcador-puntos';
-            marcador.style.cssText = "position:fixed; top:20px; right:20px; background:white; padding:10px 20px; border-radius:30px; font-weight:bold; border:3px solid var(--azul-titulo); z-index:100;";
+            // Cambiado a absolute para que se quede dentro del contenedor-mision
+            marcador.style.cssText = "position:absolute; top:20px; right:20px; background:white; padding:10px 20px; border-radius:30px; font-weight:bold; border:3px solid var(--azul-titulo); z-index:100; box-shadow: 0 4px 10px rgba(0,0,0,0.1);";
             marcador.innerHTML = `Puntos: <span id="puntos-val">0</span>`;
-            document.body.appendChild(marcador);
+            document.getElementById('contenedor-mision').appendChild(marcador);
         }
     }
 

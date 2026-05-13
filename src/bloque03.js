@@ -1,16 +1,18 @@
-export function iniciarBloque1(onFinalizar, onSumarPuntos) {
+export function iniciarBloque3(onFinalizar, onSumarPuntos) {
     const dropZone = document.getElementById('drop-zone');
     const cardsContainer = document.getElementById('cards-container');
     const btnVerificar = document.getElementById('btn-verificar');
     
-    const datosCreacion = [
-        { día: 1, img: "imgs/bloque01/L4-p.9-creación.png", desc: "En la creación, Papá Dios dice que me ama." },
-        { día: 2, img: "imgs/bloque01/p.12--Abraham-y-amigos-en-camino.png", desc: "Abraham, Isaac y Jacob confiaron en Dios y en sus promesas" },
-        { día: 3, img: "imgs/bloque01/p.16-Moisés-con-tablas.png", desc: "Dios cumple sus promesas, cuida de su pueblo y me enseña a vivir con amor." },
-        { día: 4, img: "imgs/bloque01/Isaias profetizando-anuncio.png", desc: "Isaías fue un profeta que anunció la llegada de Jesús, el Salvador." },
-        { día: 5, img: "imgs/bloque01/p.24-Nacimiento.png", desc: "Jesus es el Emanuel, que significa Dios con nosotros." },
-        { día: 6, img: "imgs/bloque01/Maria y Jesus.png", desc: "Jesús, Hijo de María, llegó para quedarse con nosotros." },
-        { día: 7, img: "imgs/bloque01/p.30-Jesús-y-papa-Dios.png", desc: "Escuchar a Jesús es escuchar la voz amorosa de Papá Dios." }
+    // DATOS CORREGIDOS SEGÚN EL DOCUMENTO Y TUS INDICACIONES
+    const datosVidaJesus = [
+        { id: 1, img: "imgs/bloque03/p.53-Jesús-crecía-(todo).png", desc: "Crecer en sabiduría y gracia significa aprender cada dia, hacer preguntas y acercarme más a Dios, siguiendo el ejemplo de Jesús." },
+        { id: 2, img: "imgs/bloque03/Apóstoles-con-Jesús-en-camino.png", desc: "Jesús llama mirando lo bueno de cada persona." },
+        { id: 3, img: "imgs/bloque03/p.56-Milagros-obras-(todo).png", desc: "Jesús realizo milagros para manifestar el amor de Dios y fortalecer la comunidad." },
+        { id: 4, img: "imgs/bloque03/L9ILT7_JuegoA.png", desc: "En la ultima cena, Jesús se queda en el vino y el pan." },
+        { id: 5, img: "imgs/bloque03/L9ILT7_JuegoB.png", desc: "Jesús murió en la Cruz oara darnos vida nueva." },
+        { id: 6, img: "imgs/bloque03/L9ILT7_JuegoC.png", desc: "¡Jesús esta vivo! Su amor es más fuerte que la muerte y siempre está con nosotros." },
+        { id: 7, img: "imgs/bloque03/Pentecostés.png", desc: "El Espíritu Santo nos une como una gran familia de fe y nos llena de alegría." },
+        { id: 8, img: "imgs/bloque03/p.60 Nombres de Jesús(todo).png", desc: "Los nombres de jesús nos revela quién es El y cómo se relaciona con nosotros." }
     ];
 
     // 1. Limpiar e Inicializar
@@ -19,26 +21,26 @@ export function iniciarBloque1(onFinalizar, onSumarPuntos) {
     btnVerificar.classList.remove('hidden');
     btnVerificar.style.display = "block";
 
-    // 2. Crear Slots
-    datosCreacion.forEach(d => {
+    // 2. Crear Slots (Pasos 1 al 8)
+    datosVidaJesus.forEach(d => {
         const slot = document.createElement('div');
         slot.className = 'slot';
-        slot.dataset.day = d.día;
+        slot.dataset.id = d.id;
         slot.innerHTML = `
-            <span class="slot-number">Día ${d.día}</span>
+            <span class="slot-number">Paso ${d.id}</span>
             <div class="slot-placeholder">?</div>
         `;
         dropZone.appendChild(slot);
     });
 
     // 3. Crear Cartas (Mezcladas)
-    [...datosCreacion].sort(() => Math.random() - 0.5).forEach(d => {
+    [...datosVidaJesus].sort(() => Math.random() - 0.5).forEach(d => {
         const card = document.createElement('div');
         card.className = 'card-foto';
         card.draggable = true;
-        card.dataset.day = d.día;
+        card.dataset.id = d.id;
         card.innerHTML = `
-            <img src="${d.img}" alt="${d.desc}">
+            <img src="${d.img}" alt="Historia">
             <p>${d.desc}</p>
         `;
         
@@ -47,15 +49,13 @@ export function iniciarBloque1(onFinalizar, onSumarPuntos) {
         cardsContainer.appendChild(card);
     });
 
-    // 4. Lógica de Interacción (Drag & Drop)
+    // 4. Lógica de Interacción (Mismo código funcional de tu captura)
     const manejarDrop = (e, target) => {
         e.preventDefault();
         const dragging = document.querySelector('.dragging');
         if (!dragging) return;
 
         if (target.classList.contains('slot')) {
-            target.style.border = "2px solid #eee";
-            target.style.background = "#fdfdfd";
             const placeholder = target.querySelector('.slot-placeholder');
             const existingCard = target.querySelector('.card-foto');
             if (existingCard) cardsContainer.appendChild(existingCard);
@@ -65,8 +65,6 @@ export function iniciarBloque1(onFinalizar, onSumarPuntos) {
             const parent = dragging.parentElement;
             if (parent && parent.classList.contains('slot')) {
                 parent.querySelector('.slot-placeholder').style.display = 'block';
-                parent.style.border = "2px solid #eee";
-                parent.style.background = "#fdfdfd";
             }
             cardsContainer.appendChild(dragging);
         }
@@ -80,51 +78,35 @@ export function iniciarBloque1(onFinalizar, onSumarPuntos) {
     cardsContainer.addEventListener('dragover', e => e.preventDefault());
     cardsContainer.addEventListener('drop', e => manejarDrop(e, cardsContainer));
 
-    // 5. Verificación con Conteo Detallado
+    // 5. Verificación
     const btnNuevo = btnVerificar.cloneNode(true);
     btnVerificar.parentNode.replaceChild(btnNuevo, btnVerificar);
 
     btnNuevo.addEventListener('click', () => {
         let aciertos = 0;
-        let errores = 0;
-        let vacios = 0;
         const slotsParaValidar = document.querySelectorAll('.slot');
         
         slotsParaValidar.forEach(slot => {
             const card = slot.querySelector('.card-foto');
-            
-            if (card) {
-                if (String(card.dataset.day) === String(slot.dataset.day)) {
-                    aciertos++;
-                    slot.style.setProperty('border', '4px solid var(--verde-exito)', 'important');
-                    slot.style.backgroundColor = "rgba(76, 175, 80, 0.1)";
-                } else {
-                    errores++;
-                    slot.style.setProperty('border', '4px solid var(--rojo-primaria)', 'important');
-                    slot.style.backgroundColor = "rgba(192, 57, 90, 0.1)";
-                }
-            } else {
-                vacios++;
-                slot.style.setProperty('border', '2px dashed #ccc', 'important');
+            if (card && String(card.dataset.id) === String(slot.dataset.id)) {
+                aciertos++;
+                slot.style.border = "4px solid var(--verde-exito)";
+                slot.style.backgroundColor = "rgba(76, 175, 80, 0.1)";
+            } else if (card) {
+                slot.style.border = "4px solid var(--rojo-primaria)";
+                slot.style.backgroundColor = "rgba(192, 57, 90, 0.1)";
             }
         });
 
-        if (aciertos === 7) {
+        if (aciertos === datosVidaJesus.length) {
             btnNuevo.style.pointerEvents = "none";
-            onSumarPuntos(70);
-            // El mensaje de "Nivel completado" lo maneja el onFinalizar en el main.js
+            onSumarPuntos(100);
             setTimeout(() => {
                 btnNuevo.classList.add('hidden');
                 onFinalizar(); 
             }, 600);
         } else {
-            // Feedback de progreso
-            let mensaje = `Llevas ${aciertos} bien de 7.`;
-            if (errores > 0) mensaje += `\nHay ${errores} en el lugar equivocado.`;
-            if (vacios > 0) mensaje += `\nTe faltan ${vacios} imágenes por colocar.`;
-            
-            alert(mensaje); // Puedes cambiar esto por un modal personalizado
-            
+            alert(`Llevas ${aciertos} correctas de ${datosVidaJesus.length}. ¡Sigue intentando!`);
             btnNuevo.animate([
                 { transform: 'translateX(0)' },
                 { transform: 'translateX(-5px)' },

@@ -1,6 +1,6 @@
 import { iniciarBloque1 } from './bloque01.js';
 import { iniciarBloque2 } from './bloque02.js';
-//import { iniciarBloque3 } from './bloque03.js';
+import { iniciarBloque3 } from './bloque03.js';
 
 let puntajeTotal = 0;
 

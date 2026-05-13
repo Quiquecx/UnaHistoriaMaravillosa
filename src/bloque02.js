@@ -13,18 +13,18 @@ export function iniciarBloque2(onFinalizar, onSumarPuntos) {
 
     const todosLosDatos = [
         // Nivel 1
-        { id: 1, img: "imgs/bloque02/Isaias profetizando-anuncio.png", nivel: 1 },
-        { id: 2, img: "imgs/bloque02/Maria y Jesus.png", nivel: 1 }, // Asegura tener esta ruta
+        { id: 1, img: "imgs/bloque02/L9-Virgen_maria.png", nivel: 1 },
+        { id: 2, img: "imgs/bloque02/p.20-Isaías-profetizando.png", nivel: 1 }, 
         { id: 3, img: "imgs/bloque02/p.26-Pesebre-vacío.png", nivel: 1 },
         // Nivel 2
-        { id: 4, img: "imgs/bloque02/p.26-Pesebre-con-Jesús-y-pesebre-vacío.png", nivel: 2 },
-        { id: 5, img: "imgs/bloque02/Reyes_magos.png", nivel: 2 },
-        { id: 6, img: "imgs/bloque02/Pastores.jpg", nivel: 2 },
+        { id: 4, img: "imgs/bloque02/Jesus nino.png", nivel: 2 },
+        { id: 5, img: "imgs/bloque02/L5-3 reyes magos juntos de pie con fondo pesebre.png", nivel: 2 },
+        { id: 6, img: "imgs/bloque02/p.24-Nacimiento.png", nivel: 2 },
         // Nivel 3
-        { id: 7, img: "imgs/bloque02/B1T6_Jesus Maria Jose.jpg", nivel: 3 },
-        { id: 8, img: "imgs/bloque02/Jesus nino.jpg", nivel: 3 },
-        { id: 9, img: "imgs/bloque02/Buen_pastor.png", nivel: 3 },
-        { id: 10, img: "imgs/bloque02/Sagrado_corazon.png", nivel: 3 }
+        { id: 7, img: "imgs/bloque02/Familia de Jesus.png", nivel: 3 },
+        { id: 8, img: "imgs/bloque02/Jesus nino.png", nivel: 3 },
+        { id: 9, img: "imgs/bloque02/Buen_pastor.png", nivel: 3 },//Falta subir
+        { id: 10, img: "imgs/bloque02/Sagrado_corazon.png", nivel: 3 }// Falta subir
     ];
 
     function cargarNivel(nivel) {

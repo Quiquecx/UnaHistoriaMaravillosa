@@ -4,8 +4,18 @@ import { iniciarBloque3 } from './bloque03.js';
 
 let puntajeTotal = 0;
 
+// 1. PRECARGA DE SONIDOS
+const sonidoIntro = new Audio('sounds/intro.mp3');
+const sonidoBuena = new Audio('sounds/buena.mp3');
+const sonidoMala = new Audio('sounds/mala.mp3');
+
+// Configuración de Volumen (0.0 a 1.0)
+sonidoIntro.volume = 0.05; // Volumen bajo para la intro
+sonidoBuena.volume = 0.6;
+sonidoMala.volume = 0.5;
+
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. REFERENCIAS
+    // 2. REFERENCIAS
     const pantallaInicio = document.getElementById('pantalla-inicio');
     const pantallaSelector = document.getElementById('pantalla-selector');
     const escenarioJuego = document.getElementById('escenario-juego');
@@ -15,9 +25,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnVolverInicio = document.getElementById('btn-volver-inicio');
     const btnCerrarModal = document.getElementById('btn-cerrar-modal');
 
-    // 2. NAVEGACIÓN BÁSICA (Prueba esto primero)
+    // 3. NAVEGACIÓN BÁSICA
     btnJugarIntro.onclick = () => {
-        console.log("Botón Jugar presionado"); // Revisa la consola (F12)
+        reproducirIntro(); 
         pantallaInicio.classList.add('hidden');
         pantallaSelector.classList.remove('hidden');
     };
@@ -27,21 +37,23 @@ document.addEventListener('DOMContentLoaded', () => {
             "¿Cómo jugar?", 
             "Elige un capítulo en el libro. Dentro de cada nivel, arrastra las imágenes a su lugar correcto y presiona 'Revisar' para ganar puntos."
         );
-        // Configuramos el botón del modal para que solo cierre
         btnCerrarModal.onclick = ocultarModal;
     };
 
     btnVolverInicio.onclick = () => {
+        detenerIntro(); // Detenemos si vuelve al inicio o si prefieres que siga, quita esta línea
         pantallaSelector.classList.add('hidden');
         pantallaInicio.classList.remove('hidden');
     };
 
-    // 3. SELECCIÓN DE BLOQUES
+    // 4. SELECCIÓN DE BLOQUES
     document.getElementById('selector-b1').onclick = () => cargarBloque(1);
     document.getElementById('selector-b2').onclick = () => cargarBloque(2);
     document.getElementById('selector-b3').onclick = () => cargarBloque(3);
 
     function cargarBloque(numero) {
+        detenerIntro(); // <--- AQUÍ: Detenemos la música al entrar a cualquier bloque
+        
         pantallaSelector.classList.add('hidden');
         escenarioJuego.classList.remove('hidden');
         crearMarcadorPuntos();
@@ -60,25 +72,44 @@ document.addEventListener('DOMContentLoaded', () => {
         
         btnCerrarModal.onclick = () => {
             ocultarModal();
-            // Ejecutamos la función que importamos
-            funcionIniciar(finalizarBloqueGeneral, sumarPuntos);
+            funcionIniciar(finalizarBloqueGeneral, sumarPuntos, reproducirAcierto, reproducirError);
         };
     }
 
-    // En main.js
     function finalizarBloqueGeneral() {
-        // Este mensaje solo se dispara cuando el bloque llama a onFinalizar()
-        mostrarMensajeGlobal("¡Increíble! ✅", "Has ordenado correctamente los días de la Creación. ¡Eres un experto!");
+        reproducirAcierto(); 
+        mostrarMensajeGlobal("¡Increíble! ✅", "Has completado este desafío con éxito. ¡Sigue así!");
         
         btnCerrarModal.onclick = () => {
             ocultarModal();
             escenarioJuego.classList.add('hidden');
             pantallaSelector.classList.remove('hidden');
-            // Aquí podrías desbloquear el siguiente nivel visualmente en el libro
         };
     }
 
-    // --- FUNCIONES DE APOYO ---
+    // --- FUNCIONES DE APOYO Y SONIDOS ---
+    
+    function reproducirIntro() {
+        sonidoIntro.currentTime = 0;
+        sonidoIntro.loop = true; // Para que no se corte en la pantalla de selección
+        sonidoIntro.play().catch(e => console.log("Interacción requerida para audio."));
+    }
+
+    function detenerIntro() {
+        sonidoIntro.pause();
+        sonidoIntro.currentTime = 0; // Reiniciamos el track
+    }
+
+    function reproducirAcierto() {
+        sonidoBuena.currentTime = 0;
+        sonidoBuena.play();
+    }
+
+    function reproducirError() {
+        sonidoMala.currentTime = 0;
+        sonidoMala.play();
+    }
+
     function sumarPuntos(puntos) {
         puntajeTotal += puntos;
         const val = document.getElementById('puntos-val');
@@ -90,7 +121,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!marcador) {
             marcador = document.createElement('div');
             marcador.id = 'marcador-puntos';
-            // Cambiado a absolute para que se quede dentro del contenedor-mision
             marcador.style.cssText = "position:absolute; top:20px; right:20px; background:white; padding:10px 20px; border-radius:30px; font-weight:bold; border:3px solid var(--azul-titulo); z-index:100; box-shadow: 0 4px 10px rgba(0,0,0,0.1);";
             marcador.innerHTML = `Puntos: <span id="puntos-val">0</span>`;
             document.getElementById('contenedor-mision').appendChild(marcador);
@@ -108,7 +138,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('modal-mensaje').classList.add('hidden');
     }
 
-    // Ajuste de escala
     function ajustarEscala() {
         const baseW = 1024; const baseH = 768;
         const escala = Math.min(window.innerWidth / baseW, window.innerHeight / baseH);

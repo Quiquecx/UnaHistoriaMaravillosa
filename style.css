@@ -122,7 +122,7 @@ body, html {
     position: absolute;
     bottom: 30px;
     right: 30px;
-    max-width: 130px; /* Tamaño reducido de 200 a 130 */
+    max-width: 50px; /* Tamaño reducido de 200 a 130 */
     height: auto;
     z-index: 5;
     pointer-events: none;

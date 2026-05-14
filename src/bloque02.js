@@ -23,8 +23,8 @@ export function iniciarBloque2(onFinalizar, onSumarPuntos) {
         // Nivel 3
         { id: 7, img: "imgs/bloque02/Familia de Jesus.png", nivel: 3 },
         { id: 8, img: "imgs/bloque02/Jesus nino.png", nivel: 3 },
-        { id: 9, img: "imgs/bloque02/Buen_pastor.png", nivel: 3 },//Falta subir
-        { id: 10, img: "imgs/bloque02/Sagrado_corazon.png", nivel: 3 }// Falta subir
+        { id: 9, img: "imgs/bloque02/personajes_itinerario_libro_4-01.png", nivel: 3 },//Falta subir
+        { id: 10, img: "imgs/bloque02/personajes_itinerario_libro_4-04.png", nivel: 3 }// Falta subir
     ];
 
     function cargarNivel(nivel) {

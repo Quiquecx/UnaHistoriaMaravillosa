@@ -59,11 +59,11 @@ document.addEventListener('DOMContentLoaded', () => {
         crearMarcadorPuntos();
 
         if (numero === 1) {
-            iniciarFlujoBloque(1, "✨ CAPÍTULO I: LA CREACIÓN ✨", iniciarBloque1);
+            iniciarFlujoBloque(1, "✨ Te cuento que... ✨", iniciarBloque1);
         } else if (numero === 2) {
-            iniciarFlujoBloque(2, "📖 CAPÍTULO II: LA INFANCIA 📖", iniciarBloque2);
+            iniciarFlujoBloque(2, "📖 La historia continúa... 📖", iniciarBloque2);
         } else if (numero === 3) {
-            iniciarFlujoBloque(3, "🌟 CAPÍTULO III: VIDA Y OBRA 🌟", iniciarBloque3);
+            iniciarFlujoBloque(3, "🌟 Y Sigue la historia 🌟", iniciarBloque3);
         }
     }
 

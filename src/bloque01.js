@@ -1,16 +1,19 @@
-export function iniciarBloque1(onFinalizar, onSumarPuntos) {
+export function iniciarBloque1(onFinalizar, onSumarPuntos, playCorrecto, playError) {
     const dropZone = document.getElementById('drop-zone');
     const cardsContainer = document.getElementById('cards-container');
     const btnVerificar = document.getElementById('btn-verificar');
     
+    // VARIABLE PARA CONTROLAR EL AUDIO ACTUAL
+    let audioActual = null;
+
     const datosCreacion = [
-        { día: 1, img: "imgs/bloque01/L4-p.9-creación.png", desc: "En la creación, Papá Dios dice que me ama." },
-        { día: 2, img: "imgs/bloque01/p.12--Abraham-y-amigos-en-camino.png", desc: "Abraham, Isaac y Jacob confiaron en Dios y en sus promesas" },
-        { día: 3, img: "imgs/bloque01/p.16-Moisés-con-tablas.png", desc: "Dios cumple sus promesas, cuida de su pueblo y me enseña a vivir con amor." },
-        { día: 4, img: "imgs/bloque01/Isaias profetizando-anuncio.png", desc: "Isaías fue un profeta que anunció la llegada de Jesús, el Salvador." },
-        { día: 5, img: "imgs/bloque01/p.24-Nacimiento.png", desc: "Jesus es el Emanuel, que significa Dios con nosotros." },
-        { día: 6, img: "imgs/bloque01/Maria y Jesus.png", desc: "Jesús, Hijo de María, llegó para quedarse con nosotros." },
-        { día: 7, img: "imgs/bloque01/p.30-Jesús-y-papa-Dios.png", desc: "Escuchar a Jesús es escuchar la voz amorosa de Papá Dios." }
+        { día: 1, img: "imgs/bloque01/L4-p.9-creación.png", audio: "sounds/bloque01/voz_01.mp3" },
+        { día: 2, img: "imgs/bloque01/p.12--Abraham-y-amigos-en-camino.png", audio: "sounds/bloque01/voz_02.mp3" },
+        { día: 3, img: "imgs/bloque01/p.16-Moisés-con-tablas.png", audio: "sounds/bloque01/voz_03.mp3" },
+        { día: 4, img: "imgs/bloque01/Isaias profetizando-anuncio.png", audio: "sounds/bloque01/voz_04.mp3" },
+        { día: 5, img: "imgs/bloque01/p.24-Nacimiento.png", audio: "sounds/bloque01/voz_05.mp3" },
+        { día: 6, img: "imgs/bloque01/Maria y Jesus.png", audio: "sounds/bloque01/voz_06.mp3" },
+        { día: 7, img: "imgs/bloque01/p.30-Jesús-y-papa-Dios.png", audio: "sounds/bloque01/voz_07.mp3" }
     ];
 
     // 1. Limpiar e Inicializar
@@ -25,23 +28,39 @@ export function iniciarBloque1(onFinalizar, onSumarPuntos) {
         slot.className = 'slot';
         slot.dataset.day = d.día;
         slot.innerHTML = `
-            <span class="slot-number">Día ${d.día}</span>
+            <span class="slot-number">Paso ${d.día}</span>
             <div class="slot-placeholder">?</div>
         `;
         dropZone.appendChild(slot);
     });
 
-    // 3. Crear Cartas (Mezcladas)
+    // 3. Crear Cartas
     [...datosCreacion].sort(() => Math.random() - 0.5).forEach(d => {
         const card = document.createElement('div');
-        card.className = 'card-foto';
-        card.draggable = true;
+        card.className = 'card-foto card-grande'; 
+        card.draggable = false; 
         card.dataset.day = d.día;
-        card.innerHTML = `
-            <img src="${d.img}" alt="${d.desc}">
-            <p>${d.desc}</p>
-        `;
         
+        card.innerHTML = `<img src="${d.img}" alt="Imagen de la historia">`;
+        
+        // EVENTO DE CLIC ACTUALIZADO
+        card.onclick = () => {
+            // Si hay un audio sonando, lo pausamos y reseteamos
+            if (audioActual) {
+                audioActual.pause();
+                audioActual.currentTime = 0;
+            }
+
+            // Creamos y reproducimos el nuevo audio
+            audioActual = new Audio(d.audio);
+            audioActual.play();
+            
+            // Habilitar interacción
+            card.draggable = true;
+            card.style.border = "3px solid var(--azul-titulo)";
+            card.classList.add('activada');
+        };
+
         card.addEventListener('dragstart', () => card.classList.add('dragging'));
         card.addEventListener('dragend', () => card.classList.remove('dragging'));
         cardsContainer.appendChild(card);
@@ -54,8 +73,6 @@ export function iniciarBloque1(onFinalizar, onSumarPuntos) {
         if (!dragging) return;
 
         if (target.classList.contains('slot')) {
-            target.style.border = "2px solid #eee";
-            target.style.background = "#fdfdfd";
             const placeholder = target.querySelector('.slot-placeholder');
             const existingCard = target.querySelector('.card-foto');
             if (existingCard) cardsContainer.appendChild(existingCard);
@@ -65,8 +82,6 @@ export function iniciarBloque1(onFinalizar, onSumarPuntos) {
             const parent = dragging.parentElement;
             if (parent && parent.classList.contains('slot')) {
                 parent.querySelector('.slot-placeholder').style.display = 'block';
-                parent.style.border = "2px solid #eee";
-                parent.style.background = "#fdfdfd";
             }
             cardsContainer.appendChild(dragging);
         }
@@ -76,61 +91,44 @@ export function iniciarBloque1(onFinalizar, onSumarPuntos) {
         s.addEventListener('dragover', e => e.preventDefault());
         s.addEventListener('drop', e => manejarDrop(e, s));
     });
-
     cardsContainer.addEventListener('dragover', e => e.preventDefault());
     cardsContainer.addEventListener('drop', e => manejarDrop(e, cardsContainer));
 
-    // 5. Verificación con Conteo Detallado
+    // 5. Verificación
     const btnNuevo = btnVerificar.cloneNode(true);
     btnVerificar.parentNode.replaceChild(btnNuevo, btnVerificar);
 
     btnNuevo.addEventListener('click', () => {
+        // Detener voz si el niño da clic en verificar mientras suena algo
+        if (audioActual) {
+            audioActual.pause();
+        }
+
         let aciertos = 0;
-        let errores = 0;
-        let vacios = 0;
         const slotsParaValidar = document.querySelectorAll('.slot');
         
         slotsParaValidar.forEach(slot => {
             const card = slot.querySelector('.card-foto');
-            
             if (card) {
                 if (String(card.dataset.day) === String(slot.dataset.day)) {
                     aciertos++;
-                    slot.style.setProperty('border', '4px solid var(--verde-exito)', 'important');
-                    slot.style.backgroundColor = "rgba(76, 175, 80, 0.1)";
+                    slot.style.border = "4px solid var(--verde-exito)";
                 } else {
-                    errores++;
-                    slot.style.setProperty('border', '4px solid var(--rojo-primaria)', 'important');
-                    slot.style.backgroundColor = "rgba(192, 57, 90, 0.1)";
+                    slot.style.border = "4px solid var(--rojo-primaria)";
                 }
-            } else {
-                vacios++;
-                slot.style.setProperty('border', '2px dashed #ccc', 'important');
             }
         });
 
         if (aciertos === 7) {
-            btnNuevo.style.pointerEvents = "none";
+            playCorrecto();
             onSumarPuntos(70);
-            // El mensaje de "Nivel completado" lo maneja el onFinalizar en el main.js
             setTimeout(() => {
                 btnNuevo.classList.add('hidden');
                 onFinalizar(); 
             }, 600);
         } else {
-            // Feedback de progreso
-            let mensaje = `Llevas ${aciertos} bien de 7.`;
-            if (errores > 0) mensaje += `\nHay ${errores} en el lugar equivocado.`;
-            if (vacios > 0) mensaje += `\nTe faltan ${vacios} imágenes por colocar.`;
-            
-            alert(mensaje); // Puedes cambiar esto por un modal personalizado
-            
-            btnNuevo.animate([
-                { transform: 'translateX(0)' },
-                { transform: 'translateX(-5px)' },
-                { transform: 'translateX(5px)' },
-                { transform: 'translateX(0)' }
-            ], { duration: 300 });
+            playError();
+            alert("Sigue intentando, revisa el orden.");
         }
     });
 }

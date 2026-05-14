@@ -117,12 +117,11 @@ body, html {
     box-shadow: 0 15px 35px rgba(0,0,0,0.1);
 }
 
-/* Personaje reducido en esquina inferior derecha */
 .img-decorativa-derecha {
     position: absolute;
     bottom: 30px;
     right: 30px;
-    max-width: 50px; /* Tamaño reducido de 200 a 130 */
+    max-width: 50px;
     height: auto;
     z-index: 5;
     pointer-events: none;
@@ -130,9 +129,9 @@ body, html {
 }
 
 /* ==========================================================
-   5. SELECTOR DE BLOQUES (LIBRO ABIERTO)
+   5. SELECTOR DE BLOQUES (LIBRO ABIERTO) - SOLUCIÓN FINAL
    ========================================================== */
-.titulo-selector {
+   .titulo-selector {
     color: var(--azul-titulo);
     font-size: 2rem;
     font-weight: 900;
@@ -154,15 +153,40 @@ body, html {
     height: 340px;
     background: white;
     border: 1px solid #ddd;
-    border-radius: 5px;
-    padding: 15px;
+    border-radius: 15px;
+    padding: 0; /* Sin espacio interno */
     transition: all 0.3s ease;
     cursor: pointer;
+    overflow: hidden; /* Corta la imagen en las esquinas */
+    position: relative;
+}
+
+/* Forzamos al contenedor interno (contenido-pagina) a ocupar todo el espacio */
+.contenido-pagina {
+    width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    box-shadow: 2px 2px 5px rgba(0,0,0,0.05);
+    justify-content: flex-start;
+}
+
+.pagina-bloque img {
+    width: 100% !important; /* Forzamos el ancho total */
+    height: 250px !important; /* Altura para que cubra la parte superior */
+    object-fit: cover; /* Esto estira la imagen para llenar el recuadro sin deformar */
+    display: block;
+    margin: 0 0 15px 0; /* Quitamos márgenes laterales */
+}
+
+/* Ajuste del botón para que respire un poco abajo */
+.pagina-bloque .btn-menu {
+    margin-top: auto;
+    margin-bottom: 20px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    width: 85%;
+    z-index: 2;
 }
 
 .pagina-bloque:hover {
@@ -170,46 +194,26 @@ body, html {
     box-shadow: 8px 15px 20px rgba(0,0,0,0.1);
 }
 
-.pagina-bloque img {
-    max-width: 80%;
-    height: auto;
-    border-radius: 10px;
-}
-
-.numero-cap {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 900;
-    font-size: 1.8rem;
-    color: var(--amarillo-escolar);
-    -webkit-text-stroke: 1px var(--azul-titulo);
-}
-
-.btn-mini {
-    margin-top: 15px;
-    background: none;
-    border: none;
-    color: var(--azul-titulo);
-    font-weight: 700;
-    cursor: pointer;
-    text-decoration: underline;
-    font-family: 'Quicksand';
+/* Eliminamos títulos que estorben */
+.pagina-bloque h3, .pagina-bloque span {
+    display: none;
 }
 
 /* ==========================================================
-   6. BLOQUE 01 Y 03: ÁREA DE JUEGO (Actualizado)
+   6. ÁREA DE JUEGO (BLOQUE 01 Y 03) - ACTUALIZADO
    ========================================================== */
-   .game-area {
+.game-area {
     width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 25px; /* Más espacio entre zonas */
+    gap: 25px;
 }
 
 .drop-container {
     display: flex;
     justify-content: center;
-    flex-wrap: wrap; /* Permite que bajen si hay muchas como en el bloque 3 */
+    flex-wrap: wrap;
     gap: 15px;
     background: rgba(255,255,255,0.6);
     padding: 20px;
@@ -218,10 +222,10 @@ body, html {
     max-width: 950px;
 }
 
-/* Slots más grandes: 120x160 */
+/* Slots ajustados al nuevo tamaño de carta */
 .slot {
-    width: 120px; 
-    height: 160px;
+    width: 130px; 
+    height: 165px;
     background: #fdfdfd;
     border: 2px solid #eee;
     border-radius: 15px;
@@ -253,20 +257,20 @@ body, html {
     padding: 20px;
 }
 
-/* Cards más grandes: 120x160 */
+/* Card-foto rediseñada para mostrar solo imagen */
 .card-foto {
-    width: 120px;
-    height: 160px;
+    width: 130px;
+    height: 165px;
     background: white;
     padding: 8px;
-    border-radius: 12px;
+    border-radius: 15px;
     box-shadow: 0 8px 20px rgba(0,0,0,0.12);
-    cursor: grab;
-    text-align: center;
+    cursor: pointer; /* Cambiado a pointer para indicar clic (audio) */
     display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border 0.3s ease;
+    border: 3px solid transparent;
 }
 
 .card-foto:hover {
@@ -274,49 +278,87 @@ body, html {
     box-shadow: 0 12px 25px rgba(0,0,0,0.18);
 }
 
-.card-foto img {
-    width: 100%;
-    height: 90px; /* Imagen más alta */
-    object-fit: cover;
-    border-radius: 6px;
-    border: 1px solid #f0f0f0;
+/* Estado cuando el audio ya fue escuchado */
+.card-foto.activada {
+    border: 3px solid var(--azul-titulo);
+    transform: scale(1.05);
+    cursor: grab;
 }
 
+.card-foto.dragging {
+    opacity: 0.5;
+    cursor: grabbing;
+}
+
+.card-foto img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Imagen llena toda la card */
+    border-radius: 10px;
+    pointer-events: none; /* El clic lo recibe la card-foto */
+}
+
+/* Ocultar p por si acaso queda alguno en el DOM */
 .card-foto p {
-    font-size: 0.7rem; /* Texto ligeramente más grande y legible */
-    line-height: 1.1;
-    font-weight: 700;
-    margin-top: 6px;
-    color: var(--azul-titulo);
-    display: -webkit-box;
-    -webkit-line-clamp: 3; /* Máximo 3 líneas de texto */
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    display: none;
 }
 
 /* ==========================================================
-   9. BLOQUE 02: MEMORAMA (Rediseño de Tamaño)
+   7. BLOQUE 02: MEMORAMA (REDISEÑO)
    ========================================================== */
+.cards-container[style*="grid"] {
+    display: grid !important;
+    gap: 15px;
+    padding: 20px;
+    perspective: 1000px;
+    justify-items: center;
+    align-items: center;
+}
 
 .card-memorama {
-    width: 130px; /* Aumentado de 110 a 130 */
-    height: 170px; /* Aumentado de 140 a 170 */
+    width: 130px; 
+    height: 170px;
     cursor: pointer;
     perspective: 1000px;
 }
 
-/* Ajuste para nivel difícil (Nivel 3) para que no se amontonen */
-#cards-container[style*="repeat(4"] .card-memorama {
-    width: 105px;
-    height: 140px;
+.card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-style: preserve-3d;
+}
+
+.card-memorama.flipped .card-inner {
+    transform: rotateY(180deg);
+}
+
+.card-front, .card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    border: 3px solid var(--blanco);
 }
 
 .card-front {
     background: var(--azul-titulo);
     color: var(--amarillo-escolar);
-    font-size: 3.5rem; /* Número más grande */
+    font-size: 3.5rem;
     font-weight: 900;
-    text-shadow: 0 4px 0 rgba(0,0,0,0.2);
+}
+
+.card-back {
+    background: var(--blanco);
+    transform: rotateY(180deg);
 }
 
 .card-back img {
@@ -325,50 +367,27 @@ body, html {
     object-fit: contain;
 }
 
-/* ==========================================================
-   7. UI ADICIONAL (FOOTER Y MARCADOR)
-   ========================================================== */
-#marcador-nivel {
-    background: var(--azul-titulo);
-    color: white;
-    padding: 8px 30px;
-    border-radius: 50px;
-    font-weight: 700;
-    font-size: 1.1rem;
-    box-shadow: 0 4px 0 var(--azul-claro);
+/* Ajustes Memorama Nivel 3 */
+#cards-container[style*="repeat(4"] .card-memorama {
+    width: 105px;
+    height: 140px;
 }
-
-.footer-derechos {
-    margin-top: auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-}
-
-.footer-derechos p {
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: var(--azul-titulo);
-}
-
-.logo-footer { max-width: 30px; opacity: 0.7; }
 
 /* ==========================================================
-   8. MODAL RESTRINGIDO AL CONTENEDOR
+   8. MODALES Y UI ADICIONAL
    ========================================================== */
-   .modal {
-    position: absolute; /* Cambiado de fixed a absolute */
+.modal {
+    position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.6); /* Oscurece solo el área del juego */
+    background: rgba(0, 0, 0, 0.6);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
-    border-radius: 40px; /* Para que no se salga de las esquinas redondeadas */
+    border-radius: 40px;
 }
 
 .modal-contenido {
@@ -388,27 +407,6 @@ body, html {
     to { transform: scale(1); opacity: 1; }
 }
 
-#modal-titulo {
-    color: var(--azul-titulo);
-    font-family: 'Montserrat', sans-serif;
-    margin-bottom: 15px;
-}
-
-#modal-texto {
-    font-size: 1.1rem;
-    color: #444;
-    line-height: 1.5;
-    margin-bottom: 20px;
-}
-
-/* Puntaje llamativo dentro del modal */
-.score-final {
-    margin-top: 15px;
-    font-weight: 900;
-    font-size: 1.4rem;
-    color: var(--verde-exito);
-}
-/* Animación de error */
 @keyframes shake {
     0% { transform: translateX(0); }
     25% { transform: translateX(-5px); }
@@ -417,98 +415,23 @@ body, html {
     100% { transform: translateX(0); }
 }
 
-.error-shake {
-    animation: shake 0.4s ease-in-out;
-}
-.error-shake {
-    animation: shake 0.4s ease-in-out;
-}
+.error-shake { animation: shake 0.4s ease-in-out; }
 
-/* ==========================================================
-   9. BLOQUE 02: MEMORAMA (NIVEL PROGRESIVO)
-   ========================================================== */
-
-/* Contenedor adaptativo para los diferentes niveles */
-.cards-container[style*="grid"] {
-    display: grid !important;
-    gap: 15px;
-    padding: 20px;
-    perspective: 1000px;
-    justify-items: center;
-    align-items: center;
+#marcador-puntos {
+    /* Los estilos ya se manejan por JS en inline-css, pero puedes añadir extras aquí */
+    font-family: 'Montserrat', sans-serif;
 }
-
-.card-memorama {
-    width: 110px;
-    height: 140px;
-    cursor: pointer;
-    perspective: 1000px;
-}
-
-.card-inner {
-    position: relative;
+/* Ajuste para las imágenes dentro del libro del selector */
+.pagina-bloque img {
     width: 100%;
-    height: 100%;
-    text-align: center;
-    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-    transform-style: preserve-3d;
-}
-
-/* Clase que activa el volteo */
-.card-memorama.flipped .card-inner {
-    transform: rotateY(180deg);
-}
-
-.card-front, .card-back {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-    border-radius: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-    border: 3px solid var(--blanco);
-}
-
-/* Parte trasera de la carta (lo que se ve al inicio) */
-.card-front {
-    background: var(--azul-titulo);
-    color: var(--amarillo-escolar);
-    font-size: 2.5rem;
-    font-weight: 900;
-}
-
-/* Parte delantera de la carta (la imagen revelada) */
-.card-back {
-    background: var(--blanco);
-    transform: rotateY(180deg);
-}
-
-.card-back img {
-    width: 90%;
-    height: 90%;
-    object-fit: contain;
+    height: 180px; /* Ajusta según el espacio blanco de tu captura */
+    object-fit: contain; /* O 'cover' si prefieres que llenen todo el recuadro */
     border-radius: 10px;
+    margin-bottom: 10px;
+    background: #f9f9f9; /* Un fondo suave por si la imagen es transparente */
 }
 
-/* Ajustes de tamaño para niveles con muchas cartas (Nivel 3) */
-#cards-container[style*="repeat(4"] .card-memorama {
-    width: 90px;
-    height: 120px;
-}
-
-/* Efecto cuando ya se encontró el par */
-.card-memorama.matched {
-    opacity: 0.8;
-    pointer-events: none;
-    transform: scale(0.95);
-    transition: all 0.3s ease;
-}
-
-.card-memorama.matched .card-inner {
-    border: 3px solid var(--verde-exito);
-    border-radius: 15px;
+/* Ocultar el título de texto si prefieres que solo se vea la imagen */
+.pagina-bloque h3 {
+    display: none; 
 }

@@ -1,18 +1,20 @@
-export function iniciarBloque3(onFinalizar, onSumarPuntos) {
+export function iniciarBloque3(onFinalizar, onSumarPuntos, playCorrecto, playError) {
     const dropZone = document.getElementById('drop-zone');
     const cardsContainer = document.getElementById('cards-container');
     const btnVerificar = document.getElementById('btn-verificar');
     
-    // DATOS CORREGIDOS SEGÚN EL DOCUMENTO Y TUS INDICACIONES
+    // VARIABLE PARA CONTROLAR EL AUDIO ACTUAL (Evita que se encimen)
+    let audioActual = null;
+
     const datosVidaJesus = [
-        { id: 1, img: "imgs/bloque03/p.53-Jesús-crecía-(todo).png", desc: "Crecer en sabiduría y gracia significa aprender cada dia, hacer preguntas y acercarme más a Dios, siguiendo el ejemplo de Jesús." },
-        { id: 2, img: "imgs/bloque03/Apóstoles-con-Jesús-en-camino.png", desc: "Jesús llama mirando lo bueno de cada persona." },
-        { id: 3, img: "imgs/bloque03/p.56-Milagros-obras-(todo).png", desc: "Jesús realizo milagros para manifestar el amor de Dios y fortalecer la comunidad." },
-        { id: 4, img: "imgs/bloque03/L9ILT7_JuegoA.png", desc: "En la ultima cena, Jesús se queda en el vino y el pan." },
-        { id: 5, img: "imgs/bloque03/L9ILT7_JuegoB.png", desc: "Jesús murió en la Cruz oara darnos vida nueva." },
-        { id: 6, img: "imgs/bloque03/L9ILT7_JuegoC.png", desc: "¡Jesús esta vivo! Su amor es más fuerte que la muerte y siempre está con nosotros." },
-        { id: 7, img: "imgs/bloque03/Pentecostés.png", desc: "El Espíritu Santo nos une como una gran familia de fe y nos llena de alegría." },
-        { id: 8, img: "imgs/bloque03/p.60 Nombres de Jesús(todo).png", desc: "Los nombres de jesús nos revela quién es El y cómo se relaciona con nosotros." }
+        { id: 1, img: "imgs/bloque03/p.53-Jesús-crecía-(todo).png", audio: "sounds/bloque03/voz_b3_01.mp3" },
+        { id: 2, img: "imgs/bloque03/Apóstoles-con-Jesús-en-camino.png", audio: "sounds/bloque03/voz_b3_02.mp3" },
+        { id: 3, img: "imgs/bloque03/p.56-Milagros-obras-(todo).png", audio: "sounds/bloque03/voz_b3_03.mp3" },
+        { id: 4, img: "imgs/bloque03/L9ILT7_JuegoA.png", audio: "sounds/bloque03/voz_b3_04.mp3" },
+        { id: 5, img: "imgs/bloque03/L9ILT7_JuegoB.png", audio: "sounds/bloque03/voz_b3_05.mp3" },
+        { id: 6, img: "imgs/bloque03/L9ILT7_JuegoC.png", audio: "sounds/bloque03/voz_b3_06.mp3" },
+        { id: 7, img: "imgs/bloque03/Pentecostés.png", audio: "sounds/bloque03/voz_b3_07.mp3" },
+        { id: 8, img: "imgs/bloque03/p.60 Nombres de Jesús(todo).png", audio: "sounds/bloque03/voz_b3_08.mp3" }
     ];
 
     // 1. Limpiar e Inicializar
@@ -33,23 +35,38 @@ export function iniciarBloque3(onFinalizar, onSumarPuntos) {
         dropZone.appendChild(slot);
     });
 
-    // 3. Crear Cartas (Mezcladas)
+    // 3. Crear Cartas (Mezcladas y solo con imagen)
     [...datosVidaJesus].sort(() => Math.random() - 0.5).forEach(d => {
         const card = document.createElement('div');
-        card.className = 'card-foto';
-        card.draggable = true;
+        card.className = 'card-foto card-grande'; 
+        card.draggable = false; // Bloqueado hasta escuchar audio
         card.dataset.id = d.id;
-        card.innerHTML = `
-            <img src="${d.img}" alt="Historia">
-            <p>${d.desc}</p>
-        `;
         
+        card.innerHTML = `<img src="${d.img}" alt="Historia">`;
+        
+        // EVENTO DE CLIC PARA ESCUCHAR VOZ
+        card.onclick = () => {
+            // Detener cualquier audio que esté sonando
+            if (audioActual) {
+                audioActual.pause();
+                audioActual.currentTime = 0;
+            }
+
+            // Reproducir nueva voz
+            audioActual = new Audio(d.audio);
+            audioActual.play().catch(e => console.warn("Error al reproducir audio:", e));
+            
+            // Habilitar el arrastre y dar feedback visual
+            card.draggable = true;
+            card.classList.add('activada');
+        };
+
         card.addEventListener('dragstart', () => card.classList.add('dragging'));
         card.addEventListener('dragend', () => card.classList.remove('dragging'));
         cardsContainer.appendChild(card);
     });
 
-    // 4. Lógica de Interacción (Mismo código funcional de tu captura)
+    // 4. Lógica de Interacción (Drag & Drop)
     const manejarDrop = (e, target) => {
         e.preventDefault();
         const dragging = document.querySelector('.dragging');
@@ -74,7 +91,6 @@ export function iniciarBloque3(onFinalizar, onSumarPuntos) {
         s.addEventListener('dragover', e => e.preventDefault());
         s.addEventListener('drop', e => manejarDrop(e, s));
     });
-
     cardsContainer.addEventListener('dragover', e => e.preventDefault());
     cardsContainer.addEventListener('drop', e => manejarDrop(e, cardsContainer));
 
@@ -83,36 +99,35 @@ export function iniciarBloque3(onFinalizar, onSumarPuntos) {
     btnVerificar.parentNode.replaceChild(btnNuevo, btnVerificar);
 
     btnNuevo.addEventListener('click', () => {
+        // Detener voz si el usuario verifica mientras suena
+        if (audioActual) audioActual.pause();
+
         let aciertos = 0;
         const slotsParaValidar = document.querySelectorAll('.slot');
         
         slotsParaValidar.forEach(slot => {
             const card = slot.querySelector('.card-foto');
-            if (card && String(card.dataset.id) === String(slot.dataset.id)) {
-                aciertos++;
-                slot.style.border = "4px solid var(--verde-exito)";
-                slot.style.backgroundColor = "rgba(76, 175, 80, 0.1)";
-            } else if (card) {
-                slot.style.border = "4px solid var(--rojo-primaria)";
-                slot.style.backgroundColor = "rgba(192, 57, 90, 0.1)";
+            if (card) {
+                if (String(card.dataset.id) === String(slot.dataset.id)) {
+                    aciertos++;
+                    slot.style.border = "4px solid var(--verde-exito)";
+                } else {
+                    slot.style.border = "4px solid var(--rojo-primaria)";
+                }
             }
         });
 
         if (aciertos === datosVidaJesus.length) {
             btnNuevo.style.pointerEvents = "none";
+            playCorrecto(); // Sonido desde main.js
             onSumarPuntos(100);
             setTimeout(() => {
                 btnNuevo.classList.add('hidden');
                 onFinalizar(); 
             }, 600);
         } else {
-            alert(`Llevas ${aciertos} correctas de ${datosVidaJesus.length}. ¡Sigue intentando!`);
-            btnNuevo.animate([
-                { transform: 'translateX(0)' },
-                { transform: 'translateX(-5px)' },
-                { transform: 'translateX(5px)' },
-                { transform: 'translateX(0)' }
-            ], { duration: 300 });
+            playError(); // Sonido desde main.js
+            alert(`Llevas ${aciertos} de ${datosVidaJesus.length} correctas.`);
         }
     });
 }

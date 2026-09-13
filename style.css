@@ -200,88 +200,135 @@ body, html {
 }
 
 /* ==========================================================
-   6. ÁREA DE JUEGO (BLOQUE 01 Y 03) - ACTUALIZADO
+   6. ÁREA DE JUEGO (BLOQUE 01) - DISTRIBUCIÓN GRID 4x3 Y SLOTS
    ========================================================== */
-.game-area {
+   .game-area {
     width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 25px;
+    gap: 15px;
 }
 
-.drop-container {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 15px;
-    background: rgba(255,255,255,0.6);
-    padding: 20px;
+/* Grilla principal de 12 columnas para distribuir 4 arriba y 3 abajo */
+.drop-container, .cards-container {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.6);
+    padding: 16px;
     border-radius: 30px;
     border: 3px dashed var(--azul-claro);
-    max-width: 950px;
+    width: 100%;
+    max-width: 920px;
+    justify-items: center;
+    align-items: center;
+    box-sizing: border-box;
 }
 
-/* Slots ajustados al nuevo tamaño de carta */
+/* Fila 1: Primeros 4 elementos ocupan 3 columnas cada uno (4 x 3 = 12) */
+.drop-container .slot:nth-child(-n+4),
+.cards-container .card-foto:nth-child(-n+4) {
+    grid-column: span 3;
+}
+
+/* Fila 2: Elementos 5, 6 y 7 centrados en la grilla */
+.drop-container .slot:nth-child(5),
+.cards-container .card-foto:nth-child(5) { 
+    grid-column: 2 / span 3; 
+}
+
+.drop-container .slot:nth-child(6),
+.cards-container .card-foto:nth-child(6) { 
+    grid-column: 5 / span 3; 
+}
+
+.drop-container .slot:nth-child(7),
+.cards-container .card-foto:nth-child(7) { 
+    grid-column: 8 / span 3; 
+}
+
+/* Slots estilizados con proporción e indicador */
 .slot {
-    width: 130px; 
-    height: 165px;
-    background: #fdfdfd;
-    border: 2px solid #eee;
-    border-radius: 15px;
     position: relative;
+    width: 100%;
+    max-width: 160px;
+    height: 125px;
+    background: #fdfdfd;
+    border: 2px dashed var(--azul-claro);
+    border-radius: 15px;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s ease;
+    transition: all 0.25s ease;
+    overflow: hidden;
+    box-sizing: border-box;
 }
 
-.slot-number {
+/* Marcador visual del número grande al pie del recuadro */
+.slot-number-footer {
     position: absolute;
-    top: -12px;
-    background: var(--amarillo-escolar);
-    color: var(--azul-titulo);
+    bottom: 3px;
+    right: 8px;
+    font-size: 1.4rem;
     font-weight: 900;
-    padding: 4px 12px;
-    border-radius: 10px;
-    font-size: 0.85rem;
-    border: 2px solid var(--azul-titulo);
-    z-index: 5;
+    color: var(--azul-titulo);
+    opacity: 0.8;
+    pointer-events: none;
+    line-height: 1;
+    z-index: 2;
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
 }
 
-.cards-container {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 15px;
-    padding: 20px;
+/* Indicador de Calificación Dinámica (✔ / ✖) */
+.slot-feedback {
+    position: absolute;
+    top: 4px;
+    left: 6px;
+    font-size: 1.3rem;
+    font-weight: 900;
+    z-index: 10;
+    pointer-events: none;
 }
 
-/* Card-foto rediseñada para mostrar solo imagen */
+.slot-correcto {
+    border: 3px solid var(--verde-exito) !important;
+    background: rgba(200, 230, 201, 0.5);
+}
+.slot-correcto .slot-feedback { color: var(--verde-exito); }
+
+.slot-incorrecto {
+    border: 3px solid var(--rojo-primaria) !important;
+    background: rgba(255, 205, 210, 0.5);
+}
+.slot-incorrecto .slot-feedback { color: var(--rojo-primaria); }
+
+/* Card-foto rediseñada para encajar perfectamente con los slots */
 .card-foto {
-    width: 130px;
-    height: 165px;
+    width: 100%;
+    max-width: 160px;
+    height: 125px;
     background: white;
-    padding: 8px;
+    padding: 5px;
     border-radius: 15px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
-    cursor: pointer; /* Cambiado a pointer para indicar clic (audio) */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
+    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: transform 0.2s ease, box-shadow 0.2s ease, border 0.3s ease;
     border: 3px solid transparent;
+    box-sizing: border-box;
 }
 
 .card-foto:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 25px rgba(0,0,0,0.18);
+    transform: translateY(-4px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.18);
 }
 
-/* Estado cuando el audio ya fue escuchado */
 .card-foto.activada {
     border: 3px solid var(--azul-titulo);
-    transform: scale(1.05);
+    transform: scale(1.02);
     cursor: grab;
 }
 
@@ -293,13 +340,12 @@ body, html {
 .card-foto img {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Imagen llena toda la card */
+    object-fit: cover;
     border-radius: 10px;
-    pointer-events: none; /* El clic lo recibe la card-foto */
+    pointer-events: none;
 }
 
-/* Ocultar p por si acaso queda alguno en el DOM */
-.card-foto p {
+.card-foto p, .slot-number {
     display: none;
 }
 

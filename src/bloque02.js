@@ -1,5 +1,5 @@
-export function iniciarBloque2(onFinalizar, onSumarPuntos) {
-    const contenedor = document.getElementById('cards-container'); // Reutilizamos tu contenedor
+export function iniciarBloque2(onFinalizar, onSumarPuntos, playCorrecto, playError) {
+    const contenedor = document.getElementById('cards-container');
     const dropZone = document.getElementById('drop-zone');
     const btnVerificar = document.getElementById('btn-verificar');
 
@@ -23,8 +23,8 @@ export function iniciarBloque2(onFinalizar, onSumarPuntos) {
         // Nivel 3
         { id: 7, img: "imgs/bloque02/Familia de Jesus.png", nivel: 3 },
         { id: 8, img: "imgs/bloque02/Jesus nino.png", nivel: 3 },
-        { id: 9, img: "imgs/bloque02/personajes_itinerario_libro_4-01.png", nivel: 3 },//Falta subir
-        { id: 10, img: "imgs/bloque02/personajes_itinerario_libro_4-04.png", nivel: 3 }// Falta subir
+        { id: 9, img: "imgs/bloque02/personajes_itinerario_libro_4-01.png", nivel: 3 },
+        { id: 10, img: "imgs/bloque02/personajes_itinerario_libro_4-04.png", nivel: 3 }
     ];
 
     function cargarNivel(nivel) {
@@ -40,7 +40,7 @@ export function iniciarBloque2(onFinalizar, onSumarPuntos) {
         contenedor.style.display = "grid";
         contenedor.style.gridTemplateColumns = nivel === 1 ? "repeat(3, 1fr)" : "repeat(4, 1fr)";
 
-        mazo.forEach((data, index) => {
+        mazo.forEach((data) => {
             const card = document.createElement('div');
             card.className = 'card-memorama';
             card.dataset.id = data.id;
@@ -69,16 +69,20 @@ export function iniciarBloque2(onFinalizar, onSumarPuntos) {
     function verificarPar() {
         const [c1, c2] = cartasVolteadas;
         if (c1.dataset.id === c2.dataset.id) {
+            // Par acertado
+            playCorrecto();
             paresEncontrados++;
             onSumarPuntos(10);
             cartasVolteadas = [];
             
-            // ¿Completó el nivel?
+            // ¿Completó el subnivel?
             const totalParesNivel = todosLosDatos.filter(d => d.nivel <= nivelActual).length;
             if (paresEncontrados === totalParesNivel) {
                 setTimeout(siguientePaso, 1000);
             }
         } else {
+            // Par incorrecto
+            playError();
             setTimeout(() => {
                 c1.classList.remove('flipped');
                 c2.classList.remove('flipped');

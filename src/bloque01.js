@@ -3,8 +3,12 @@ export function iniciarBloque1(onFinalizar, onSumarPuntos, playCorrecto, playErr
     const cardsContainer = document.getElementById('cards-container');
     const btnVerificar = document.getElementById('btn-verificar');
     
-    // VARIABLE PARA CONTROLAR EL AUDIO ACTUAL
+    // CONTROL DE AUDIO ACTUAL
     let audioActual = null;
+
+    // 0. Reproducir audio de indicaciones al iniciar el nivel
+    audioActual = new Audio("sounds/bloque01/indicaciones_nivel_01.mp3");
+    audioActual.play().catch(() => {});
 
     const datosCreacion = [
         { día: 1, img: "imgs/bloque01/L4-p.9-creación.png", audio: "sounds/bloque01/voz_01.mp3" },
@@ -28,8 +32,9 @@ export function iniciarBloque1(onFinalizar, onSumarPuntos, playCorrecto, playErr
         slot.className = 'slot';
         slot.dataset.day = d.día;
         slot.innerHTML = `
-            <span class="slot-number">Paso ${d.día}</span>
             <div class="slot-placeholder">?</div>
+            <div class="slot-feedback"></div>
+            <span class="slot-number-footer">${d.día}</span>
         `;
         dropZone.appendChild(slot);
     });
@@ -43,19 +48,15 @@ export function iniciarBloque1(onFinalizar, onSumarPuntos, playCorrecto, playErr
         
         card.innerHTML = `<img src="${d.img}" alt="Imagen de la historia">`;
         
-        // EVENTO DE CLIC ACTUALIZADO
         card.onclick = () => {
-            // Si hay un audio sonando, lo pausamos y reseteamos
             if (audioActual) {
                 audioActual.pause();
                 audioActual.currentTime = 0;
             }
 
-            // Creamos y reproducimos el nuevo audio
             audioActual = new Audio(d.audio);
             audioActual.play();
             
-            // Habilitar interacción
             card.draggable = true;
             card.style.border = "3px solid var(--azul-titulo)";
             card.classList.add('activada');
@@ -66,7 +67,7 @@ export function iniciarBloque1(onFinalizar, onSumarPuntos, playCorrecto, playErr
         cardsContainer.appendChild(card);
     });
 
-    // 4. Lógica de Interacción (Drag & Drop)
+    // 4. Lógica Drag & Drop con VALIDACIÓN E INCORPORACIÓN DE AUDIO EN TIEMPO REAL
     const manejarDrop = (e, target) => {
         e.preventDefault();
         const dragging = document.querySelector('.dragging');
@@ -74,14 +75,35 @@ export function iniciarBloque1(onFinalizar, onSumarPuntos, playCorrecto, playErr
 
         if (target.classList.contains('slot')) {
             const placeholder = target.querySelector('.slot-placeholder');
+            const feedback = target.querySelector('.slot-feedback');
             const existingCard = target.querySelector('.card-foto');
+
             if (existingCard) cardsContainer.appendChild(existingCard);
+            
             placeholder.style.display = 'none';
             target.appendChild(dragging);
+
+            // Validar de inmediato al colocar la carta
+            const esCorrecto = String(dragging.dataset.day) === String(target.dataset.day);
+
+            if (esCorrecto) {
+                target.classList.remove('slot-incorrecto');
+                target.classList.add('slot-correcto');
+                feedback.innerHTML = "✔";
+                playCorrecto(); // Audio de éxito inmediato
+            } else {
+                target.classList.remove('slot-correcto');
+                target.classList.add('slot-incorrecto');
+                feedback.innerHTML = "✖";
+                playError(); // Audio de error inmediato
+            }
+
         } else if (target === cardsContainer) {
             const parent = dragging.parentElement;
             if (parent && parent.classList.contains('slot')) {
                 parent.querySelector('.slot-placeholder').style.display = 'block';
+                parent.querySelector('.slot-feedback').innerHTML = "";
+                parent.classList.remove('slot-correcto', 'slot-incorrecto');
             }
             cardsContainer.appendChild(dragging);
         }
@@ -94,28 +116,22 @@ export function iniciarBloque1(onFinalizar, onSumarPuntos, playCorrecto, playErr
     cardsContainer.addEventListener('dragover', e => e.preventDefault());
     cardsContainer.addEventListener('drop', e => manejarDrop(e, cardsContainer));
 
-    // 5. Verificación
+    // 5. Botón Verificar (Comprueba si completó los 7 slots correctamente)
     const btnNuevo = btnVerificar.cloneNode(true);
     btnVerificar.parentNode.replaceChild(btnNuevo, btnVerificar);
 
     btnNuevo.addEventListener('click', () => {
-        // Detener voz si el niño da clic en verificar mientras suena algo
         if (audioActual) {
             audioActual.pause();
         }
 
         let aciertos = 0;
-        const slotsParaValidar = document.querySelectorAll('.slot');
+        const slots = document.querySelectorAll('.slot');
         
-        slotsParaValidar.forEach(slot => {
+        slots.forEach(slot => {
             const card = slot.querySelector('.card-foto');
-            if (card) {
-                if (String(card.dataset.day) === String(slot.dataset.day)) {
-                    aciertos++;
-                    slot.style.border = "4px solid var(--verde-exito)";
-                } else {
-                    slot.style.border = "4px solid var(--rojo-primaria)";
-                }
+            if (card && String(card.dataset.day) === String(slot.dataset.day)) {
+                aciertos++;
             }
         });
 
@@ -125,10 +141,10 @@ export function iniciarBloque1(onFinalizar, onSumarPuntos, playCorrecto, playErr
             setTimeout(() => {
                 btnNuevo.classList.add('hidden');
                 onFinalizar(); 
-            }, 600);
+            }, 800);
         } else {
             playError();
-            alert("Sigue intentando, revisa el orden.");
+            alert("Aún hay espacios vacíos o imágenes en el orden equivocado.");
         }
     });
 }

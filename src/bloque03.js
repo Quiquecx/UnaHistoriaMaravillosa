@@ -6,6 +6,10 @@ export function iniciarBloque3(onFinalizar, onSumarPuntos, playCorrecto, playErr
     // VARIABLE PARA CONTROLAR EL AUDIO ACTUAL (Evita que se encimen)
     let audioActual = null;
 
+    // 0. Reproducir audio de indicaciones al iniciar el nivel 3
+    audioActual = new Audio("sounds/bloque03/indicaciones_n3.mp3");
+    audioActual.play().catch(e => console.warn("Error al reproducir indicaciones:", e));
+
     const datosVidaJesus = [
         { id: 1, img: "imgs/bloque03/p.53-Jesús-crecía-(todo).png", audio: "sounds/bloque03/voz_b3_01.mp3" },
         { id: 2, img: "imgs/bloque03/Apóstoles-con-Jesús-en-camino.png", audio: "sounds/bloque03/voz_b3_02.mp3" },
@@ -23,14 +27,15 @@ export function iniciarBloque3(onFinalizar, onSumarPuntos, playCorrecto, playErr
     btnVerificar.classList.remove('hidden');
     btnVerificar.style.display = "block";
 
-    // 2. Crear Slots (Pasos 1 al 8)
+    // 2. Crear Slots (Pasos 1 al 8 con espacio para feedback)
     datosVidaJesus.forEach(d => {
         const slot = document.createElement('div');
         slot.className = 'slot';
         slot.dataset.id = d.id;
         slot.innerHTML = `
-            <span class="slot-number">Paso ${d.id}</span>
             <div class="slot-placeholder">?</div>
+            <div class="slot-feedback"></div>
+            <span class="slot-number-footer">${d.id}</span>
         `;
         dropZone.appendChild(slot);
     });
@@ -46,18 +51,16 @@ export function iniciarBloque3(onFinalizar, onSumarPuntos, playCorrecto, playErr
         
         // EVENTO DE CLIC PARA ESCUCHAR VOZ
         card.onclick = () => {
-            // Detener cualquier audio que esté sonando
             if (audioActual) {
                 audioActual.pause();
                 audioActual.currentTime = 0;
             }
 
-            // Reproducir nueva voz
             audioActual = new Audio(d.audio);
             audioActual.play().catch(e => console.warn("Error al reproducir audio:", e));
             
-            // Habilitar el arrastre y dar feedback visual
             card.draggable = true;
+            card.style.border = "3px solid var(--azul-titulo)";
             card.classList.add('activada');
         };
 
@@ -66,7 +69,7 @@ export function iniciarBloque3(onFinalizar, onSumarPuntos, playCorrecto, playErr
         cardsContainer.appendChild(card);
     });
 
-    // 4. Lógica de Interacción (Drag & Drop)
+    // 4. Lógica Drag & Drop con VALIDACIÓN E INDICADORES EN TIEMPO REAL
     const manejarDrop = (e, target) => {
         e.preventDefault();
         const dragging = document.querySelector('.dragging');
@@ -74,14 +77,35 @@ export function iniciarBloque3(onFinalizar, onSumarPuntos, playCorrecto, playErr
 
         if (target.classList.contains('slot')) {
             const placeholder = target.querySelector('.slot-placeholder');
+            const feedback = target.querySelector('.slot-feedback');
             const existingCard = target.querySelector('.card-foto');
+
             if (existingCard) cardsContainer.appendChild(existingCard);
+            
             placeholder.style.display = 'none';
             target.appendChild(dragging);
+
+            // Calificación inmediata al soltar
+            const esCorrecto = String(dragging.dataset.id) === String(target.dataset.id);
+
+            if (esCorrecto) {
+                target.classList.remove('slot-incorrecto');
+                target.classList.add('slot-correcto');
+                feedback.innerHTML = "✔";
+                playCorrecto();
+            } else {
+                target.classList.remove('slot-correcto');
+                target.classList.add('slot-incorrecto');
+                feedback.innerHTML = "✖";
+                playError();
+            }
+
         } else if (target === cardsContainer) {
             const parent = dragging.parentElement;
             if (parent && parent.classList.contains('slot')) {
                 parent.querySelector('.slot-placeholder').style.display = 'block';
+                parent.querySelector('.slot-feedback').innerHTML = "";
+                parent.classList.remove('slot-correcto', 'slot-incorrecto');
             }
             cardsContainer.appendChild(dragging);
         }
@@ -94,40 +118,34 @@ export function iniciarBloque3(onFinalizar, onSumarPuntos, playCorrecto, playErr
     cardsContainer.addEventListener('dragover', e => e.preventDefault());
     cardsContainer.addEventListener('drop', e => manejarDrop(e, cardsContainer));
 
-    // 5. Verificación
+    // 5. Botón Verificar (Comprueba que los 8 slots estén correctos)
     const btnNuevo = btnVerificar.cloneNode(true);
     btnVerificar.parentNode.replaceChild(btnNuevo, btnVerificar);
 
     btnNuevo.addEventListener('click', () => {
-        // Detener voz si el usuario verifica mientras suena
         if (audioActual) audioActual.pause();
 
         let aciertos = 0;
-        const slotsParaValidar = document.querySelectorAll('.slot');
+        const slots = document.querySelectorAll('.slot');
         
-        slotsParaValidar.forEach(slot => {
+        slots.forEach(slot => {
             const card = slot.querySelector('.card-foto');
-            if (card) {
-                if (String(card.dataset.id) === String(slot.dataset.id)) {
-                    aciertos++;
-                    slot.style.border = "4px solid var(--verde-exito)";
-                } else {
-                    slot.style.border = "4px solid var(--rojo-primaria)";
-                }
+            if (card && String(card.dataset.id) === String(slot.dataset.id)) {
+                aciertos++;
             }
         });
 
         if (aciertos === datosVidaJesus.length) {
             btnNuevo.style.pointerEvents = "none";
-            playCorrecto(); // Sonido desde main.js
+            playCorrecto();
             onSumarPuntos(100);
             setTimeout(() => {
                 btnNuevo.classList.add('hidden');
                 onFinalizar(); 
-            }, 600);
+            }, 800);
         } else {
-            playError(); // Sonido desde main.js
-            alert(`Llevas ${aciertos} de ${datosVidaJesus.length} correctas.`);
+            playError();
+            alert("Aún hay espacios vacíos o imágenes en el orden equivocado.");
         }
     });
 }

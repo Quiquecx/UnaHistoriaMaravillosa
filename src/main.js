@@ -2,6 +2,9 @@ import { iniciarBloque1 } from './bloque01.js';
 import { iniciarBloque2 } from './bloque02.js';
 import { iniciarBloque3 } from './bloque03.js';
 
+// Polyfill para habilitar Drag & Drop nativo en celulares/tablets
+import 'https://cdn.jsdelivr.net/npm/drag-drop-touch';
+
 let puntajeTotal = 0;
 
 // 1. PRECARGA DE SONIDOS
@@ -41,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     btnVolverInicio.onclick = () => {
-        detenerIntro(); // Detenemos si vuelve al inicio o si prefieres que siga, quita esta línea
+        detenerIntro();
         pantallaSelector.classList.add('hidden');
         pantallaInicio.classList.remove('hidden');
     };
@@ -52,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('selector-b3').onclick = () => cargarBloque(3);
 
     function cargarBloque(numero) {
-        detenerIntro(); // <--- AQUÍ: Detenemos la música al entrar a cualquier bloque
+        detenerIntro();
         
         pantallaSelector.classList.add('hidden');
         escenarioJuego.classList.remove('hidden');
@@ -91,13 +94,13 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function reproducirIntro() {
         sonidoIntro.currentTime = 0;
-        sonidoIntro.loop = true; // Para que no se corte en la pantalla de selección
+        sonidoIntro.loop = true;
         sonidoIntro.play().catch(e => console.log("Interacción requerida para audio."));
     }
 
     function detenerIntro() {
         sonidoIntro.pause();
-        sonidoIntro.currentTime = 0; // Reiniciamos el track
+        sonidoIntro.currentTime = 0;
     }
 
     function reproducirAcierto() {
@@ -138,11 +141,19 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('modal-mensaje').classList.add('hidden');
     }
 
+    // --- ESCALADO RESPONSIVO PROPORCIONAL ---
     function ajustarEscala() {
-        const baseW = 1024; const baseH = 768;
+        const baseW = 1024; 
+        const baseH = 768;
+        
+        // Calcula la escala para que encaje tanto a lo ancho como a lo alto
         const escala = Math.min(window.innerWidth / baseW, window.innerHeight / baseH);
-        document.documentElement.style.setProperty('--escala-juego', escala < 1 ? escala * 0.98 : 1);
+        
+        // Aplica siempre el escalado proporcional para adaptarse sin salirse
+        document.documentElement.style.setProperty('--escala-juego', escala * 0.95);
     }
+    
     window.addEventListener('resize', ajustarEscala);
+    window.addEventListener('orientationchange', ajustarEscala);
     ajustarEscala();
 });

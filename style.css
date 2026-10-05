@@ -210,7 +210,7 @@ body, html {
     gap: 15px;
 }
 
-/* Grilla principal de 12 columnas para distribuir 4 arriba y 3 abajo */
+/* Grilla principal de 12 columnas */
 .drop-container, .cards-container {
     display: grid;
     grid-template-columns: repeat(12, 1fr);
@@ -224,15 +224,16 @@ body, html {
     justify-items: center;
     align-items: center;
     box-sizing: border-box;
+    grid-auto-rows: 125px;   /* 👈 CLAVE: todas las filas miden igual */
 }
 
-/* Fila 1: Primeros 4 elementos ocupan 3 columnas cada uno (4 x 3 = 12) */
+/* Fila 1: Primeros 4 elementos */
 .drop-container .slot:nth-child(-n+4),
 .cards-container .card-foto:nth-child(-n+4) {
     grid-column: span 3;
 }
 
-/* Fila 2: Elementos 5, 6 y 7 centrados en la grilla */
+/* Fila 2: Elementos 5, 6 y 7 centrados */
 .drop-container .slot:nth-child(5),
 .cards-container .card-foto:nth-child(5) { 
     grid-column: 2 / span 3; 
@@ -248,12 +249,11 @@ body, html {
     grid-column: 8 / span 3; 
 }
 
-/* Slots estilizados con proporción e indicador */
+/* Slots */
 .slot {
     position: relative;
-    width: 100%;
-    max-width: 160px;
-    height: 125px;
+    width: 160px;              /* 👈 Ancho fijo */
+    height: 125px;             /* 👈 Alto fijo */
     background: #fdfdfd;
     border: 2px dashed var(--azul-claro);
     border-radius: 15px;
@@ -265,7 +265,7 @@ body, html {
     box-sizing: border-box;
 }
 
-/* Marcador visual del número grande al pie del recuadro */
+/* Marcador de número */
 .slot-number-footer {
     position: absolute;
     bottom: 3px;
@@ -280,7 +280,7 @@ body, html {
     text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
 }
 
-/* Indicador de Calificación Dinámica (✔ / ✖) */
+/* Indicador ✔ / ✖ */
 .slot-feedback {
     position: absolute;
     top: 4px;
@@ -303,11 +303,12 @@ body, html {
 }
 .slot-incorrecto .slot-feedback { color: var(--rojo-primaria); }
 
-/* Card-foto rediseñada para encajar perfectamente con los slots */
+/* ==========================================================
+   CARD-FOTO - TAMAÑO UNIFORME FORZADO
+   ========================================================== */
 .card-foto {
-    width: 100%;
-    max-width: 160px;
-    height: 125px;
+    width: 160px;              /* 👈 Ancho fijo (igual que el slot) */
+    height: 125px;             /* 👈 Alto fijo (igual que el slot) */
     background: white;
     padding: 5px;
     border-radius: 15px;
@@ -319,6 +320,7 @@ body, html {
     transition: transform 0.2s ease, box-shadow 0.2s ease, border 0.3s ease;
     border: 3px solid transparent;
     box-sizing: border-box;
+    overflow: hidden;          /* 👈 Nada se sale de la card */
 }
 
 .card-foto:hover {
@@ -337,12 +339,15 @@ body, html {
     cursor: grabbing;
 }
 
+/* La imagen llena la card y se ve completa */
 .card-foto img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;       /* 👈 Muestra la imagen completa sin recortar */
+    object-position: center;
     border-radius: 10px;
     pointer-events: none;
+    background: #fdfdfd;
 }
 
 .card-foto p, .slot-number {
@@ -352,13 +357,14 @@ body, html {
 /* ==========================================================
    7. BLOQUE 02: MEMORAMA (REDISEÑO)
    ========================================================== */
-.cards-container[style*="grid"] {
+   .cards-container[style*="grid"] {
     display: grid !important;
     gap: 15px;
     padding: 20px;
     perspective: 1000px;
     justify-items: center;
     align-items: center;
+    grid-auto-rows: min-content;
 }
 
 .card-memorama {
@@ -366,6 +372,7 @@ body, html {
     height: 170px;
     cursor: pointer;
     perspective: 1000px;
+    flex-shrink: 0;
 }
 
 .card-inner {
@@ -393,6 +400,8 @@ body, html {
     justify-content: center;
     box-shadow: 0 4px 10px rgba(0,0,0,0.15);
     border: 3px solid var(--blanco);
+    box-sizing: border-box;   /* Importante para que el borde no altere el tamaño */
+    overflow: hidden;         /* Asegura que nada se salga del marco */
 }
 
 .card-front {
@@ -407,16 +416,23 @@ body, html {
     transform: rotateY(180deg);
 }
 
+/* La imagen siempre ocupa el 100% de la carta con contain,
+   así ninguna imagen (horizontal o vertical) deforma la tarjeta */
 .card-back img {
-    width: 95%;
-    height: 95%;
+    width: 100%;
+    height: 100%;
     object-fit: contain;
+    object-position: center;
+    display: block;
+    padding: 4px;
+    box-sizing: border-box;
 }
 
-/* Ajustes Memorama Nivel 3 */
+/* Ajustes Memorama Nivel 3 - TAMAÑO UNIFORME */
 #cards-container[style*="repeat(4"] .card-memorama {
     width: 105px;
     height: 140px;
+    flex-shrink: 0;
 }
 
 /* ==========================================================
@@ -470,11 +486,12 @@ body, html {
 /* Ajuste para las imágenes dentro del libro del selector */
 .pagina-bloque img {
     width: 100%;
-    height: 180px; /* Ajusta según el espacio blanco de tu captura */
-    object-fit: contain; /* O 'cover' si prefieres que llenen todo el recuadro */
-    border-radius: 10px;
-    margin-bottom: 10px;
-    background: #f9f9f9; /* Un fondo suave por si la imagen es transparente */
+    height: 250px;
+    object-fit: contain;  /* ← Muestra la imagen completa */
+    object-position: center;
+    display: block;
+    margin: 0 0 15px 0;
+    background: #f9f9f9;  /* Fondo suave por si la imagen tiene transparencia */
 }
 
 /* Ocultar el título de texto si prefieres que solo se vea la imagen */

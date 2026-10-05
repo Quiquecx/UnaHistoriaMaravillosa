@@ -22,7 +22,7 @@ export function iniciarBloque2(onFinalizar, onSumarPuntos, playCorrecto, playErr
         { id: 6, img: "imgs/bloque02/p.24-Nacimiento.png", nivel: 2 },
         // Nivel 3
         { id: 7, img: "imgs/bloque02/Familia de Jesus.png", nivel: 3 },
-        { id: 8, img: "imgs/bloque02/Jesus nino.png", nivel: 3 },
+        { id: 8, img: "imgs/bloque02/p.26-Pesebre-con-Jesús-y-pesebre-vacío.png", nivel: 3 },
         { id: 9, img: "imgs/bloque02/personajes_itinerario_libro_4-01.png", nivel: 3 },
         { id: 10, img: "imgs/bloque02/personajes_itinerario_libro_4-04.png", nivel: 3 }
     ];
@@ -93,14 +93,39 @@ export function iniciarBloque2(onFinalizar, onSumarPuntos, playCorrecto, playErr
 
     function siguientePaso() {
         if (nivelActual < 3) {
-            alert(`¡Nivel ${nivelActual} superado!`);
-            nivelActual++;
-            cargarNivel(nivelActual);
+            mostrarModalNivelSuperado(nivelActual);
         } else {
             // Finalización total del bloque 
-            dropZone.style.display = "flex"; // Restauramos para el siguiente bloque
+            dropZone.style.display = "flex";
             onFinalizar(); 
         }
+    }
+
+    function mostrarModalNivelSuperado(nivel) {
+        // Crear el modal dinámicamente
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.innerHTML = `
+            <div class="modal-contenido">
+                <h2 style="color: var(--azul-titulo); font-size: 2rem; margin-bottom: 15px;">
+                    ¡Nivel ${nivel} superado!
+                </h2>
+                <p style="font-size: 1.1rem; color: #555; margin-bottom: 25px;">
+                    ¡Muy bien! Vas a pasar al siguiente nivel.
+                </p>
+                <button class="btn-menu btn-primary" id="btn-continuar-nivel">
+                    Continuar ➡️
+                </button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        // Botón para continuar
+        modal.querySelector('#btn-continuar-nivel').addEventListener('click', () => {
+            modal.remove();
+            nivelActual++;
+            cargarNivel(nivelActual);
+        });
     }
 
     cargarNivel(nivelActual);
